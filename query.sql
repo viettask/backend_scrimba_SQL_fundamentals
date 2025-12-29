@@ -143,6 +143,365 @@ Select the brand, model, color and year
 		sold must be false
 */
 
-SELECT brand, model, price, sold FROM cars
-	WHERE brand IN ('Ford', 'Chevrolet', 'Ferrari')
+-- SELECT brand, model, price, sold FROM cars
+-- 	WHERE brand IN ('Ford', 'Chevrolet', 'Ferrari')
+-- 	AND sold IS FALSE;
+
+    /*
+	Select the brand, model, condition and year from cars
+		Where the year is 1961, 1963, 1965, 1967 or 1969
+		and the condition is 3 or higher
+		and sold is false
+*/
+
+SELECT brand, model, condition, year FROM cars
+	WHERE year IN (1961, 1963, 1965, 1967, 1969)
+	AND condition >= 3
 	AND sold IS FALSE;
+
+    /*
+	Select brand, model, price and sold from cars
+		filter out any cars which are sold
+		show cars where the brand is none of ('Ford', 'Triumph', 'Chevrolet', 'Dodge')
+		or the price is less than $50000
+*/
+
+SELECT brand, model, price, sold FROM cars
+	WHERE (
+		brand NOT IN ('Ford', 'Triumph', 'Chevrolet', 'Dodge')
+		OR price < 50000
+	) AND sold IS FALSE;
+
+    /*
+	Select brand, model, and color from cars
+		where the color is 'red'
+		and the brand is not 'Ferrari'
+		and the car has not been sold
+*/
+
+SELECT brand, model, color FROM cars
+  WHERE color LIKE '%red%'
+  AND brand != 'Ferrari'
+  AND sold IS FALSE;
+
+  /*
+	Select brand, model, and color from cars
+		where the color is not red, blue, or white
+		and the brand is none of: Aston Martin, Bentley or Jaguar
+		and sold is false
+*/
+
+SELECT brand, model, color FROM cars
+  WHERE color NOT IN ('red', 'blue', 'white')
+  AND brand NOT IN ('Aston Martin', 'Bentley', 'Jaguar')
+  AND sold IS FALSE;
+
+  /*
+	Select brand, model, year, sold from cars
+		where the brand is 'Dodge' and year is in the 60s
+		or the brand is either 'Ford' or 'Triumph' and the car is from the 70s
+		only select cars where sold is not true
+*/
+
+SELECT brand, model, year, sold FROM cars
+  WHERE ((brand = 'Dodge' AND year BETWEEN 1960 AND 1969)
+  OR (brand IN ('Ford', 'Triumph') AND year BETWEEN 1970 AND 1979))
+  AND SOLD IS NOT TRUE;
+
+  /*
+	Select the brand, model and year from the cars table
+		order by the brand
+*/
+
+SELECT brand, model, year FROM cars
+	ORDER BY brand DESC, year;
+
+    /*
+		Select the brand, model, condition and price from cars
+		where the car is not sold
+		order the table by condition in descending order
+		and by price in ascending order
+*/
+
+SELECT brand, model, condition, price FROM cars
+	WHERE sold IS FALSE
+	ORDER BY condition DESC, price;
+
+    /*
+		Select the brand, model, condition and price from cars
+		where the car is not sold
+		and the condition is not 5
+		order the table by condition in descending order
+		and by price in ascending order
+*/
+
+SELECT brand, model, condition, price FROM cars
+	WHERE sold IS FALSE
+	AND condition != 5
+	ORDER BY condition DESC, price;
+
+    /*
+	Select the brand, model, year and price from the cars table
+		order the results by the price in descending order
+		limit the results to 1
+*/
+
+SELECT brand, model, year, price FROM cars
+	ORDER BY price DESC
+	LIMIT 1;
+
+    /*
+	Select the brand, model, color and price from cars
+		where the color is a shade of 'red'
+		and sold is false
+		order by price
+		limit the results to 5
+*/
+
+SELECT brand, model, color, price FROM cars
+	WHERE color LIKE '%red%'
+	AND sold IS FALSE
+	ORDER BY price
+	LIMIT 5;
+
+    /*
+	Count the number of cars
+		where sold is true
+*/
+
+SELECT COUNT(*) FROM cars
+	WHERE sold IS TRUE;
+
+    /*
+	Sum the price of cars
+		where sold is true
+	Use the alias total_earnings in your output
+*/
+
+SELECT SUM(price) AS total_earnings FROM cars
+	WHERE sold IS TRUE;
+
+    /*
+	Use the AVG aggregate function to find the average price
+		where the brand is Bentley
+		
+		We can use FLOOR and CEIL to round the average down or up
+			to the nearest whole number
+*/
+
+SELECT AVG(price) FROM cars
+	WHERE brand = 'Bentley';
+
+    /*
+	Use the AVG aggregate function to find the average price
+		where the brand is Bentley
+		
+		We can use FLOOR and CEIL to round the average down or up
+			to the nearest whole number
+*/
+
+SELECT FLOOR(AVG(price)) AS average FROM cars
+	WHERE brand = 'Bentley';
+
+    /*
+	Select the average, minimum and maximum price from cars
+		where sold is true
+	Round the average up to the nearest whole number
+		and use 'avg' as the alias for that result	
+*/
+
+SELECT
+	CEIL(AVG(price)) AS avg,
+	MIN(price),
+	MAX(price)
+FROM cars
+	WHERE sold IS TRUE;
+
+    /*
+	Select the condition, and a count of the condition from cars
+		group by the condition column
+*/
+
+SELECT condition, count(condition) FROM cars
+	GROUP BY condition;
+
+/*
+	Select:
+		* the brand
+		* a count of the brand
+		* and an average of the price for each brand
+		* round the average down to the nearest number
+		* alias the average as 'AVG' in your output
+	From cars where
+		the car has not been sold
+	Group the table by brand.
+*/
+
+SELECT brand, count(brand), FLOOR(AVG(price)) AS AVG
+	FROM cars
+	WHERE sold IS FALSE
+	GROUP BY brand;
+
+    /*
+	Select:
+		* the brand
+		* a count of the brand
+		* and an average of the price for each brand
+		* round the average down to the nearest number
+		* alias the average as 'AVG' in your output
+	From cars where
+		the car has not been sold
+	Group the table by brand.
+	
+	Show results where the count is > 1
+*/
+
+SELECT brand, count(brand), FLOOR(AVG(price)) AS AVG
+	FROM cars
+	WHERE sold IS FALSE
+	GROUP BY brand
+	HAVING count(brand) > 1;
+
+    /*
+	Select:
+		* year
+		* a count of cars from that year, aliased as car_count
+		* the maximum price
+		* the minimum price
+	from the table cars
+		where the car has been sold
+	group by year
+		only show years where more than one car has been sold from that year
+	order the result by car_count
+*/
+
+SELECT year,
+	count(year) AS car_count,
+	MAX(price),
+	MIN(price)
+FROM cars
+WHERE sold IS TRUE
+GROUP BY year
+HAVING count(year) > 1
+ORDER BY car_count;
+
+/*
+	Select brand, model, and year from cars
+		only show the oldest 5 cars in the database
+		show cars which haven't been sold
+*/
+
+SELECT brand, model, year FROM cars
+	WHERE sold IS FALSE
+	ORDER BY year
+	LIMIT 5;
+
+    /*
+	Select color and count how many cars have each color
+		find cars which have not been sold
+		order by count in descending order
+		only show results where the count is greater than 2
+*/
+
+SELECT color, COUNT(color) FROM cars
+	WHERE sold IS FALSE
+	GROUP BY color
+	HAVING COUNT(color) > 2
+	ORDER BY COUNT(color) DESC;
+
+    /*
+	Select color and count how many cars have each color
+		find cars which have not been sold
+		order by count in descending order
+		only show results where the count is greater than 2
+*/
+
+SELECT color, COUNT(color) FROM cars
+	WHERE sold IS FALSE
+	GROUP BY color
+	HAVING COUNT(color) > 2
+	ORDER BY COUNT(color) DESC;
+
+    /*
+	Retro rides have acquired two new cars this week:
+		1. A Ford Escort RS2000 from 1978 in blue
+				the car is from 1978, a 4/5 condition
+				the car has not been sold and is listed at $39,000
+		2. A 1977 Aston Martin V8 Vantage in dark green
+				The car is in perfect condition
+				and is listed for sale at $145,000
+*/
+
+INSERT INTO cars (
+	brand, model, year, price, color, condition, sold
+) VALUES (
+	'Ford', 'Escort RS2000', 1978, 39000, 'blue', 4, FALSE
+), (
+	'Aston Martin', 'V8 Vantage', 1977, 145000, 'dark green', 5, FALSE
+);
+
+/*
+	Insert these two cars to the cars table:
+		1. Brand: Chevrolet, model: Bel Air, year: 1955,
+			retail_price: 50000, color: purple, condition 5, sold: false
+		2. Brand: Porsche, model: 944 Turbo, year: 1986,
+			retail_price: 48000, color: white, condition: 4, sold: false
+*/
+
+INSERT INTO cars (
+	brand, model, year, price, color, condition, sold
+) VALUES (
+	'Chevrolet', 'Bel Air', 1955, 50000, 'purple', 5, FALSE
+), (
+	'Porsche', '944 Turbo', 1986, 48000, 'white', 4, FALSE
+);
+
+/*
+	Set the sold column to true for the Ford Escort RS2000
+*/
+
+UPDATE cars SET
+	sold = TRUE
+WHERE brand = 'Ford'
+	AND model = 'Escort RS2000';
+
+    /*
+	Update the record for the Aston Martin DB4 with ID 14
+		set the condition to 5
+		and the price to 465000
+*/
+
+UPDATE cars SET
+	condition = 5,
+	price = 465000
+WHERE 
+	id = 14;
+
+    /*
+	Set the condition to 1
+		and the price to $10,000
+	where the car's brand is Porsche
+		and sold is false
+*/
+
+UPDATE cars SET
+	condition = 1,
+	price = 10000
+WHERE
+	brand = 'Porsche'
+	AND sold IS FALSE;
+
+    /*
+	Delete from the cars table, any record where
+		condition is 0
+*/
+
+DELETE FROM cars
+	WHERE condition = 0;
+
+    /*
+	Delete any record from the cars table where sold is TRUE
+*/
+
+DELETE FROM cars
+	WHERE sold IS TRUE;
